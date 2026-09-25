@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
@@ -13,7 +13,7 @@ import {
   Settings,
   Menu,
   LogOut,
-  User,
+  ChevronDown,
   X,
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
@@ -31,6 +31,13 @@ const NAV = [
   { to: '/settings', key: 'settings', icon: Settings, ownerOnly: true },
 ];
 
+function initialsFromName(name = '') {
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return 'U';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+}
+
 function LangSwitch() {
   const { i18n } = useTranslation();
   const isAr = i18n.language === 'ar';
@@ -42,6 +49,87 @@ function LangSwitch() {
     >
       {isAr ? 'EN' : 'العربية'}
     </button>
+  );
+}
+
+function ProfileMenu({ user, onLogout }) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef(null);
+  const menuId = useId();
+  const initials = initialsFromName(user?.name);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    function onDoc(e) {
+      if (!wrapRef.current?.contains(e.target)) setOpen(false);
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('mousedown', onDoc);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  return (
+    <div className="profile-menu" ref={wrapRef}>
+      <button
+        type="button"
+        className={`profile-trigger ${open ? 'is-open' : ''}`}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-controls={menuId}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span className="profile-avatar" aria-hidden>
+          {initials}
+        </span>
+        <span className="profile-meta">
+          <span className="profile-name">{user?.name || 'User'}</span>
+          <span className="profile-role">{user?.role || '—'}</span>
+        </span>
+        <ChevronDown
+          className={`profile-caret h-3.5 w-3.5 shrink-0 text-[#98a2b3] transition ${open ? 'rotate-180' : ''}`}
+          strokeWidth={2.25}
+          aria-hidden
+        />
+      </button>
+
+      {open ? (
+        <div id={menuId} role="menu" className="profile-dropdown" aria-label="Account menu">
+          <div className="profile-dropdown-head">
+            <span className="profile-avatar profile-avatar-lg" aria-hidden>
+              {initials}
+            </span>
+            <div className="min-w-0">
+              <div className="truncate text-[13.5px] font-bold text-[#101012]">{user?.name}</div>
+              <div className="mt-0.5 truncate text-[12px] font-medium capitalize text-[#667085]">
+                {user?.role}
+              </div>
+              {user?.email ? (
+                <div className="mt-0.5 truncate text-[11.5px] font-medium text-[#98a2b3]">{user.email}</div>
+              ) : null}
+            </div>
+          </div>
+          <div className="profile-dropdown-divider" />
+          <button
+            type="button"
+            role="menuitem"
+            className="profile-logout"
+            onClick={async () => {
+              setOpen(false);
+              await onLogout();
+            }}
+          >
+            <LogOut className="h-4 w-4 shrink-0" strokeWidth={1.9} />
+            <span>Log out</span>
+          </button>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -60,7 +148,6 @@ function Sidebar({ open, onClose }) {
 
   const content = (
     <div className="flex h-full w-[min(268px,86vw)] flex-col bg-[var(--color-sidebar)] text-white lg:w-[240px]">
-      {/* Brand */}
       <div className="border-b border-white/[0.08] px-4 pb-4 pt-5">
         <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/45">
           {t('platform')}
@@ -76,7 +163,6 @@ function Sidebar({ open, onClose }) {
         </div>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-2.5 py-3">
         {NAV.filter((n) => !n.ownerOnly || isOwner).map((item) => {
           const Icon = item.icon;
@@ -99,7 +185,6 @@ function Sidebar({ open, onClose }) {
           );
         })}
       </nav>
-
     </div>
   );
 
@@ -136,6 +221,11 @@ export function AppShell() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
+  async function handleLogout() {
+    await logout();
+    navigate('/login');
+  }
+
   return (
     <div className="min-h-full bg-[var(--color-bg)]">
       <Sidebar open={open} onClose={() => setOpen(false)} />
@@ -150,38 +240,10 @@ export function AppShell() {
             <Menu className="h-5 w-5" strokeWidth={1.75} />
           </button>
 
-          <div className="ms-auto flex items-center gap-2 sm:gap-3">
+          <div className="ms-auto flex min-w-0 items-center gap-1.5 sm:gap-2.5">
             <LangSwitch />
-
-            <div className="hidden h-5 w-px bg-[#e8e6e3] sm:block" />
-
-            {/* User cluster - single aligned group */}
-            <div className="app-user-chip">
-              <div className="hidden min-w-0 text-end sm:block">
-                <div className="max-w-[150px] truncate text-[13px] font-bold leading-tight tracking-tight text-[#101012]">
-                  {user?.name}
-                </div>
-                <div className="mt-0.5 text-[11px] font-semibold capitalize leading-none text-[#667085]">
-                  {user?.role}
-                </div>
-              </div>
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-[#667085] shadow-sm ring-1 ring-[#e8e6e3]">
-                <User className="h-3.5 w-3.5" strokeWidth={1.75} />
-              </div>
-            </div>
-
-            <button
-              type="button"
-              title="Logout"
-              aria-label="Logout"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-[#475467] transition hover:bg-[#f4f3f1] hover:text-[#101012]"
-              onClick={async () => {
-                await logout();
-                navigate('/login');
-              }}
-            >
-              <LogOut className="h-[17px] w-[17px]" strokeWidth={1.75} />
-            </button>
+            <div className="hidden h-5 w-px shrink-0 bg-[#e8e6e3] sm:block" aria-hidden />
+            <ProfileMenu user={user} onLogout={handleLogout} />
           </div>
         </header>
 
