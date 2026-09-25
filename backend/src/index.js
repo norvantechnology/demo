@@ -40,7 +40,14 @@ app.use(express.json({ limit: '2mb' }));
 app.use(cookieParser());
 app.use('/uploads', express.static(config.uploadDir));
 
-app.get('/api/health', (_req, res) => res.json({ ok: true }));
+app.get('/api/health', (_req, res) => {
+  const db = mongoose.connection.readyState; // 0=off 1=on 2=connecting 3=disconnecting
+  const ok = db === 1;
+  res.status(ok ? 200 : 503).json({
+    ok,
+    db: ok ? 'connected' : 'disconnected',
+  });
+});
 
 app.use('/api/auth', authRoutes);
 
@@ -59,11 +66,26 @@ app.use('/api/settings', settingsRoutes);
 app.use(errorHandler);
 
 async function start() {
-  await mongoose.connect(config.mongoUri);
-  console.log('MongoDB connected');
-  app.listen(config.port, () => {
-    console.log(`API listening on http://localhost:${config.port}`);
+  // Bind port first so Render detects an open port even while Mongo is connecting
+  await new Promise((resolve) => {
+    app.listen(config.port, () => {
+      console.log(`API listening on port ${config.port}`);
+      resolve();
+    });
   });
+
+  try {
+    await mongoose.connect(config.mongoUri, {
+      serverSelectionTimeoutMS: 15000,
+    });
+    console.log('MongoDB connected');
+  } catch (err) {
+    console.error('MongoDB connection failed:', err.message);
+    console.error(
+      'If this is Atlas: Network Access → Add IP Address → Allow Access from Anywhere (0.0.0.0/0), then redeploy.'
+    );
+    // Keep process alive so /api/health stays reachable for debugging; APIs will fail until DB is up
+  }
 }
 
 start().catch((err) => {
