@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
@@ -54,22 +55,54 @@ function LangSwitch() {
 
 function ProfileMenu({ user, onLogout }) {
   const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, right: 0 });
   const wrapRef = useRef(null);
+  const triggerRef = useRef(null);
+  const menuRef = useRef(null);
   const menuId = useId();
   const initials = initialsFromName(user?.name);
 
+  useLayoutEffect(() => {
+    if (!open || !triggerRef.current) return undefined;
+
+    function place() {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.bottom + 8,
+        right: Math.max(12, window.innerWidth - rect.right),
+      });
+    }
+
+    place();
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', place, true);
+    return () => {
+      window.removeEventListener('resize', place);
+      window.removeEventListener('scroll', place, true);
+    };
+  }, [open]);
+
   useEffect(() => {
     if (!open) return undefined;
+
     function onDoc(e) {
-      if (!wrapRef.current?.contains(e.target)) setOpen(false);
+      const t = e.target;
+      if (wrapRef.current?.contains(t) || menuRef.current?.contains(t)) return;
+      setOpen(false);
     }
     function onKey(e) {
       if (e.key === 'Escape') setOpen(false);
     }
-    document.addEventListener('mousedown', onDoc);
-    document.addEventListener('keydown', onKey);
+
+    // Defer so the opening click does not immediately close the menu
+    const timer = window.setTimeout(() => {
+      document.addEventListener('click', onDoc);
+      document.addEventListener('keydown', onKey);
+    }, 0);
+
     return () => {
-      document.removeEventListener('mousedown', onDoc);
+      window.clearTimeout(timer);
+      document.removeEventListener('click', onDoc);
       document.removeEventListener('keydown', onKey);
     };
   }, [open]);
@@ -77,12 +110,16 @@ function ProfileMenu({ user, onLogout }) {
   return (
     <div className="profile-menu" ref={wrapRef}>
       <button
+        ref={triggerRef}
         type="button"
         className={`profile-trigger ${open ? 'is-open' : ''}`}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={menuId}
-        onClick={() => setOpen((v) => !v)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((v) => !v);
+        }}
       >
         <span className="profile-avatar" aria-hidden>
           {initials}
@@ -98,37 +135,50 @@ function ProfileMenu({ user, onLogout }) {
         />
       </button>
 
-      {open ? (
-        <div id={menuId} role="menu" className="profile-dropdown" aria-label="Account menu">
-          <div className="profile-dropdown-head">
-            <span className="profile-avatar profile-avatar-lg" aria-hidden>
-              {initials}
-            </span>
-            <div className="min-w-0">
-              <div className="truncate text-[13.5px] font-bold text-[#101012]">{user?.name}</div>
-              <div className="mt-0.5 truncate text-[12px] font-medium capitalize text-[#667085]">
-                {user?.role}
+      {open
+        ? createPortal(
+            <div
+              ref={menuRef}
+              id={menuId}
+              role="menu"
+              className="profile-dropdown"
+              aria-label="Account menu"
+              style={{ top: coords.top, right: coords.right }}
+            >
+              <div className="profile-dropdown-head">
+                <span className="profile-avatar profile-avatar-lg" aria-hidden>
+                  {initials}
+                </span>
+                <div className="min-w-0">
+                  <div className="truncate text-[13.5px] font-bold text-[#101012]">{user?.name}</div>
+                  <div className="mt-0.5 truncate text-[12px] font-medium capitalize text-[#667085]">
+                    {user?.role}
+                  </div>
+                  {user?.email ? (
+                    <div className="mt-0.5 truncate text-[11.5px] font-medium text-[#98a2b3]">
+                      {user.email}
+                    </div>
+                  ) : null}
+                </div>
               </div>
-              {user?.email ? (
-                <div className="mt-0.5 truncate text-[11.5px] font-medium text-[#98a2b3]">{user.email}</div>
-              ) : null}
-            </div>
-          </div>
-          <div className="profile-dropdown-divider" />
-          <button
-            type="button"
-            role="menuitem"
-            className="profile-logout"
-            onClick={async () => {
-              setOpen(false);
-              await onLogout();
-            }}
-          >
-            <LogOut className="h-4 w-4 shrink-0" strokeWidth={1.9} />
-            <span>Log out</span>
-          </button>
-        </div>
-      ) : null}
+              <div className="profile-dropdown-divider" />
+              <button
+                type="button"
+                role="menuitem"
+                className="profile-logout"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  setOpen(false);
+                  await onLogout();
+                }}
+              >
+                <LogOut className="h-4 w-4 shrink-0" strokeWidth={1.9} />
+                <span>Log out</span>
+              </button>
+            </div>,
+            document.body
+          )
+        : null}
     </div>
   );
 }
