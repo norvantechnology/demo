@@ -1,0 +1,37 @@
+# Render Blueprint — Backend API
+# Dashboard: New → Blueprint → connect this repo
+# Docs: https://render.com/docs/blueprint-spec
+#
+# After first deploy:
+# 1. Set MONGODB_URI (MongoDB Atlas connection string)
+# 2. Set CLIENT_ORIGIN to your Vercel URL (e.g. https://demo.vercel.app)
+# 3. Confirm the public URL matches vercel.json rewrites
+#    (default service name → https://a2z-printing-api.onrender.com)
+# 4. Run seed once via Render Shell: npm run seed
+
+services:
+  - type: web
+    name: a2z-printing-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_EXPIRES
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES
+        value: 7d
+      - key: CLIENT_ORIGIN
+        sync: false
+      - key: UPLOAD_DIR
+        value: uploads
