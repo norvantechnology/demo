@@ -26,6 +26,9 @@ const invoiceSchema = new mongoose.Schema(
 
 invoiceSchema.index({ status: 1, dueDate: 1 });
 invoiceSchema.index({ customer: 1 });
+invoiceSchema.index({ date: -1, invoiceNo: -1 });
+invoiceSchema.index({ jobOrder: 1 });
+invoiceSchema.index({ status: 1, balance: 1 });
 
 export function displayStatus(invoice, now = new Date()) {
   if (invoice.status === 'paid') return 'paid';

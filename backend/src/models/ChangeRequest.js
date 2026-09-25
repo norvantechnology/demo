@@ -15,5 +15,6 @@ const changeRequestSchema = new mongoose.Schema(
 );
 
 changeRequestSchema.index({ entityType: 1, entityId: 1, status: 1 });
+changeRequestSchema.index({ status: 1, createdAt: -1 });
 
 export const ChangeRequest = mongoose.model('ChangeRequest', changeRequestSchema);

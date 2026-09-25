@@ -15,5 +15,7 @@ const customerSchema = new mongoose.Schema(
 
 customerSchema.index({ name: 'text', company: 'text', phone: 'text' });
 customerSchema.index({ name: 1 });
+customerSchema.index({ createdAt: -1 });
+customerSchema.index({ phone: 1 });
 
 export const Customer = mongoose.model('Customer', customerSchema);

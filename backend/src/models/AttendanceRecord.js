@@ -21,5 +21,7 @@ const attendanceSchema = new mongoose.Schema(
 );
 
 attendanceSchema.index({ employee: 1, date: 1 }, { unique: true });
+attendanceSchema.index({ date: 1, status: 1 });
+attendanceSchema.index({ date: 1, employee: 1 });
 
 export const AttendanceRecord = mongoose.model('AttendanceRecord', attendanceSchema);

@@ -1,7 +1,21 @@
 import { useId, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Mail, Lock, ClipboardList, FileText, Wallet } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  ClipboardList,
+  FileText,
+  Wallet,
+  Printer,
+  Layers,
+  Palette,
+  Scissors,
+  Image,
+  Stamp,
+} from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { BrandMark, SoftLink } from '../components/ui';
 import { useToast } from '../components/Toast';
@@ -11,6 +25,15 @@ const HIGHLIGHTS = [
   { icon: ClipboardList, label: 'Job orders' },
   { icon: FileText, label: 'Invoices' },
   { icon: Wallet, label: 'Payroll' },
+];
+
+const FLOAT_ICONS = [
+  { icon: Printer, label: 'Press' },
+  { icon: Layers, label: 'Layers' },
+  { icon: Palette, label: 'Colour' },
+  { icon: Scissors, label: 'Finish' },
+  { icon: Image, label: 'Artwork' },
+  { icon: Stamp, label: 'Proof' },
 ];
 
 export default function LoginPage() {
@@ -59,29 +82,45 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <aside className="login-brand" aria-label={t('appName')}>
+        <div aria-hidden className="login-brand-shade" />
         <div aria-hidden className="login-brand-pattern" />
-        <div className="login-brand-inner">
-          {/* Brand is the focal point: mark + name together */}
-          <div className="login-brand-hero login-rise" style={{ '--i': 0 }}>
-            <BrandMark size="lg" className="login-brand-mark" />
-            <div className="login-brand-copy">
-              <p className="login-brand-eyebrow">{t('platform')}</p>
-              <h1 className="login-brand-title">{t('appName')}</h1>
+
+        <div className="login-brand-layout">
+          <div className="login-brand-inner">
+            <div className="login-brand-hero login-rise" style={{ '--i': 0 }}>
+              <BrandMark size="lg" className="login-brand-mark" />
+              <div className="login-brand-copy">
+                <p className="login-brand-eyebrow">{t('platform')}</p>
+                <h1 className="login-brand-title">{t('appName')}</h1>
+              </div>
             </div>
+
+            <p className="login-brand-tagline login-rise" style={{ '--i': 1 }}>
+              Jobs, invoices, and payroll in one shop workspace.
+            </p>
+
+            <ul className="login-highlights login-rise" style={{ '--i': 2 }} aria-label="Workspace areas">
+              {HIGHLIGHTS.map(({ icon: Icon, label }) => (
+                <li key={label}>
+                  <Icon className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />
+                  <span>{label}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <p className="login-brand-tagline login-rise" style={{ '--i': 1 }}>
-            Jobs, invoices, and payroll in one shop workspace.
-          </p>
-
-          <ul className="login-highlights login-rise" style={{ '--i': 2 }} aria-label="Workspace areas">
-            {HIGHLIGHTS.map(({ icon: Icon, label }) => (
-              <li key={label}>
-                <Icon className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />
-                <span>{label}</span>
-              </li>
+          <div className="login-float-rail" aria-hidden>
+            {FLOAT_ICONS.map(({ icon: Icon, label }, i) => (
+              <span
+                key={label}
+                className="login-float"
+                style={{ '--i': i }}
+                title={label}
+              >
+                <Icon strokeWidth={1.75} />
+              </span>
             ))}
-          </ul>
+          </div>
         </div>
       </aside>
 

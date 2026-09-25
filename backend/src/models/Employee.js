@@ -20,5 +20,7 @@ const employeeSchema = new mongoose.Schema(
 
 employeeSchema.index({ deviceId: 1 });
 employeeSchema.index({ name: 'text' });
+employeeSchema.index({ status: 1, employeeNo: 1 });
+employeeSchema.index({ status: 1, name: 1 });
 
 export const Employee = mongoose.model('Employee', employeeSchema);

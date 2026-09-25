@@ -55,5 +55,8 @@ const jobOrderSchema = new mongoose.Schema(
 
 jobOrderSchema.index({ status: 1, date: -1 });
 jobOrderSchema.index({ customer: 1 });
+jobOrderSchema.index({ date: -1, jobOrderNo: -1 });
+jobOrderSchema.index({ invoice: 1 });
+jobOrderSchema.index({ createdBy: 1 });
 
 export const JobOrder = mongoose.model('JobOrder', jobOrderSchema);
