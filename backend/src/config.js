@@ -11,7 +11,7 @@ export const config = {
   mongoUri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/a2z_printing',
   jwtAccessSecret: process.env.JWT_ACCESS_SECRET || 'dev-access',
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || 'dev-refresh',
-  jwtAccessExpires: process.env.JWT_ACCESS_EXPIRES || '15m',
+  jwtAccessExpires: process.env.JWT_ACCESS_EXPIRES || '2h',
   jwtRefreshExpires: process.env.JWT_REFRESH_EXPIRES || '7d',
   clientOrigin: (process.env.CLIENT_ORIGIN || 'http://localhost:5173').split(',').map((s) => s.trim()),
   uploadDir: path.resolve(__dirname, '..', process.env.UPLOAD_DIR || 'uploads'),
