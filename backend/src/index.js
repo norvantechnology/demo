@@ -65,6 +65,25 @@ app.use('/api/settings', settingsRoutes);
 
 app.use(errorHandler);
 
+async function connectMongo(retries = 30, delayMs = 5000) {
+  for (let attempt = 1; attempt <= retries; attempt += 1) {
+    try {
+      await mongoose.connect(config.mongoUri, {
+        serverSelectionTimeoutMS: 15000,
+      });
+      console.log('MongoDB connected');
+      return true;
+    } catch (err) {
+      console.error(`MongoDB connect attempt ${attempt}/${retries} failed:`, err.message);
+      if (attempt < retries) {
+        console.error(`Retrying in ${delayMs / 1000}s... (Atlas Network Access must allow 0.0.0.0/0)`);
+        await new Promise((r) => setTimeout(r, delayMs));
+      }
+    }
+  }
+  return false;
+}
+
 async function start() {
   // Bind port first so Render detects an open port even while Mongo is connecting
   await new Promise((resolve) => {
@@ -74,17 +93,9 @@ async function start() {
     });
   });
 
-  try {
-    await mongoose.connect(config.mongoUri, {
-      serverSelectionTimeoutMS: 15000,
-    });
-    console.log('MongoDB connected');
-  } catch (err) {
-    console.error('MongoDB connection failed:', err.message);
-    console.error(
-      'If this is Atlas: Network Access → Add IP Address → Allow Access from Anywhere (0.0.0.0/0), then redeploy.'
-    );
-    // Keep process alive so /api/health stays reachable for debugging; APIs will fail until DB is up
+  const ok = await connectMongo();
+  if (!ok) {
+    console.error('MongoDB still unavailable after retries. /api/health will report disconnected.');
   }
 }
 
