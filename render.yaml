@@ -27,8 +27,6 @@ services:
         generateValue: true
       - key: JWT_REFRESH_SECRET
         generateValue: true
-      - key: JWT_ACCESS_EXPIRES
-        value: 2h
       - key: JWT_REFRESH_EXPIRES
         value: 7d
       - key: CLIENT_ORIGIN
