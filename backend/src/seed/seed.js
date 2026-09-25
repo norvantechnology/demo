@@ -101,23 +101,14 @@ async function seed() {
     },
   });
 
-  const passwordHash = await bcrypt.hash('password123', 10);
-  const [owner, supervisor] = await User.create([
-    {
-      name: 'Abdullah Al-Harbi',
-      email: 'owner@a2z.kw',
-      passwordHash,
-      role: 'owner',
-      companyId: company._id,
-    },
-    {
-      name: 'Salem Al-Mutairi',
-      email: 'supervisor@a2z.kw',
-      passwordHash,
-      role: 'supervisor',
-      companyId: company._id,
-    },
-  ]);
+  const passwordHash = await bcrypt.hash('Demo@123', 10);
+  const owner = await User.create({
+    name: 'Demo User',
+    email: 'demo@test.com',
+    passwordHash,
+    role: 'owner',
+    companyId: company._id,
+  });
 
   await Holiday.create([
     { name: 'National Day', date: new Date('2026-02-25'), recurring: true, companyId: company._id },
@@ -275,7 +266,7 @@ async function seed() {
       amount: isPerm ? rand(1, 4) : rand(1, 5),
       reason: isPerm ? 'Personal errand' : 'Family / medical',
       status,
-      requestedBy: supervisor._id,
+      requestedBy: owner._id,
       decidedBy: status === 'pending' ? undefined : owner._id,
       decidedAt: status === 'pending' ? undefined : from.toDate(),
       companyId: company._id,
@@ -293,7 +284,7 @@ async function seed() {
       jobOrderNo: 7001 + i,
       date,
       customer: customer._id,
-      createdBy: i % 3 === 0 ? owner._id : supervisor._id,
+      createdBy: owner._id,
       jobNature: pick(JOB_NATURES),
       actualSize: `${rand(40, 120)}x${rand(50, 200)} cm`,
       printingSize: pick(['Digital', '50x70', '100x70']),
@@ -341,7 +332,7 @@ async function seed() {
     {
       entityType: 'job_order',
       entityId: joDocs[0]._id,
-      requestedBy: supervisor._id,
+      requestedBy: owner._id,
       changes: { qtyRequired: 500, remarks: 'Increase qty per client call' },
       status: 'pending',
       companyId: company._id,
@@ -349,7 +340,7 @@ async function seed() {
     {
       entityType: 'job_order',
       entityId: joDocs[2]._id,
-      requestedBy: supervisor._id,
+      requestedBy: owner._id,
       changes: { inkColour: 'Full colour + Gold' },
       status: 'pending',
       companyId: company._id,
@@ -472,8 +463,7 @@ async function seed() {
   ]);
 
   console.log('Seed complete.');
-  console.log('Login: owner@a2z.kw / password123');
-  console.log('Login: supervisor@a2z.kw / password123');
+  console.log('Login: demo@test.com / Demo@123');
   await mongoose.disconnect();
 }
 

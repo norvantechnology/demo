@@ -21,8 +21,8 @@ export default function LoginPage() {
   const emailId = useId();
   const passwordId = useId();
   const rememberId = useId();
-  const [email, setEmail] = useState('owner@a2z.kw');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
   const [remember, setRemember] = useState(true);
   const [errors, setErrors] = useState({});
@@ -58,45 +58,41 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
-      {/* Brand column — compact on mobile, full panel on md+ */}
-      <aside className="login-brand" aria-label="A2Z Printing">
+      <aside className="login-brand" aria-label={t('appName')}>
         <div aria-hidden className="login-brand-pattern" />
-
         <div className="login-brand-inner">
-          <div className="login-brand-top login-rise" style={{ '--i': 0 }}>
-            <BrandMark size="md" />
-            <span className="login-brand-eyebrow">{t('platform')}</span>
+          {/* Brand is the focal point: mark + name together */}
+          <div className="login-brand-hero login-rise" style={{ '--i': 0 }}>
+            <BrandMark size="lg" className="login-brand-mark" />
+            <div className="login-brand-copy">
+              <p className="login-brand-eyebrow">{t('platform')}</p>
+              <h1 className="login-brand-title">{t('appName')}</h1>
+            </div>
           </div>
 
-          <div className="login-brand-hero">
-            <h1 className="login-brand-title login-rise" style={{ '--i': 1 }}>
-              {t('appName')}
-            </h1>
-            <p className="login-brand-tagline login-rise" style={{ '--i': 2 }}>
-              Jobs, invoices, and payroll in one shop workspace.
-            </p>
+          <p className="login-brand-tagline login-rise" style={{ '--i': 1 }}>
+            Jobs, invoices, and payroll in one shop workspace.
+          </p>
 
-            <ul className="login-highlights login-rise" style={{ '--i': 3 }} aria-label="Workspace areas">
-              {HIGHLIGHTS.map(({ icon: Icon, label }) => (
-                <li key={label}>
-                  <Icon className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />
-                  <span>{label}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ul className="login-highlights login-rise" style={{ '--i': 2 }} aria-label="Workspace areas">
+            {HIGHLIGHTS.map(({ icon: Icon, label }) => (
+              <li key={label}>
+                <Icon className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />
+                <span>{label}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </aside>
 
-      {/* Form column */}
       <main className="login-main">
         <div className="login-main-inner">
-          <header className="login-heading login-rise" style={{ '--i': 1 }}>
-            <h2>Sign in</h2>
-            <p>Enter your shop credentials to continue</p>
-          </header>
+          <div className="login-card login-rise" style={{ '--i': 1 }}>
+            <header className="login-heading">
+              <h2>Sign in</h2>
+              <p>Enter your shop credentials to continue</p>
+            </header>
 
-          <div className="login-card login-rise" style={{ '--i': 2 }}>
             {errors.form ? (
               <div className="login-alert" role="alert">
                 {errors.form}
@@ -119,6 +115,7 @@ export default function LoginPage() {
                       setEmail(e.target.value);
                       setErrors((x) => ({ ...x, email: undefined, form: undefined }));
                     }}
+                    placeholder="you@company.com"
                     autoComplete="username"
                     inputMode="email"
                     required
@@ -148,6 +145,7 @@ export default function LoginPage() {
                       setPassword(e.target.value);
                       setErrors((x) => ({ ...x, password: undefined, form: undefined }));
                     }}
+                    placeholder="Enter password"
                     autoComplete="current-password"
                     required
                     aria-invalid={Boolean(errors.password)}
@@ -195,8 +193,7 @@ export default function LoginPage() {
             </form>
           </div>
 
-          {/* Mobile-only feature icons under the form */}
-          <ul className="login-mobile-features login-rise" style={{ '--i': 3 }} aria-label="Workspace areas">
+          <ul className="login-mobile-features login-rise" style={{ '--i': 2 }} aria-label="Workspace areas">
             {HIGHLIGHTS.map(({ icon: Icon, label }) => (
               <li key={label}>
                 <span className="login-mobile-feature-icon">

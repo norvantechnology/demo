@@ -39,8 +39,7 @@ Open the URL Vite prints (usually http://localhost:5173). API requests are proxi
 
 | Role | Email | Password |
 |------|-------|----------|
-| Owner | `owner@a2z.kw` | `password123` |
-| Supervisor | `supervisor@a2z.kw` | `password123` |
+| Owner | `demo@test.com` | `Demo@123` |
 
 ## Deploy
 
