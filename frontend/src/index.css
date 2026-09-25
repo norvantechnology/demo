@@ -353,14 +353,6 @@ textarea:focus-visible {
   color: var(--color-accent);
 }
 
-.login-brand-foot {
-  display: none;
-  margin: 0;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #98a2b3;
-}
-
 .login-main {
   display: flex;
   align-items: center;
@@ -667,15 +659,6 @@ textarea:focus-visible {
   color: var(--color-accent);
 }
 
-.login-mobile-foot {
-  display: block;
-  margin: 1.1rem 0 0;
-  text-align: center;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #98a2b3;
-}
-
 .login-rise {
   --i: 0;
   animation: loginRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -706,9 +689,9 @@ textarea:focus-visible {
 
   .login-brand-inner {
     max-width: 26rem;
-    gap: 0;
+    gap: 2rem;
     flex: 1;
-    justify-content: space-between;
+    justify-content: center;
     min-height: min(36rem, 80vh);
   }
 
@@ -727,17 +710,12 @@ textarea:focus-visible {
     display: flex;
   }
 
-  .login-brand-foot {
-    display: block;
-  }
-
   .login-main {
     min-height: 100dvh;
     padding: 2.5rem clamp(1.5rem, 4vw, 3rem);
   }
 
-  .login-mobile-features,
-  .login-mobile-foot {
+  .login-mobile-features {
     display: none;
   }
 }

@@ -85,10 +85,6 @@ export default function LoginPage() {
               ))}
             </ul>
           </div>
-
-          <p className="login-brand-foot login-rise" style={{ '--i': 4 }}>
-            {t('domain')}
-          </p>
         </div>
       </aside>
 
@@ -210,8 +206,6 @@ export default function LoginPage() {
               </li>
             ))}
           </ul>
-
-          <p className="login-mobile-foot">{t('domain')}</p>
         </div>
       </main>
     </div>

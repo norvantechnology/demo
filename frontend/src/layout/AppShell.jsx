@@ -100,9 +100,6 @@ function Sidebar({ open, onClose }) {
         })}
       </nav>
 
-      <div className="border-t border-white/[0.08] px-4 py-3.5 text-[11px] font-medium tracking-wide text-white/30">
-        {t('domain')}
-      </div>
     </div>
   );
 
