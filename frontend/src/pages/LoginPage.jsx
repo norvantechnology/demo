@@ -1,11 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ClipboardList, FileText, Wallet } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { BrandMark, Button, Input, SoftLink } from '../components/ui';
 import { useToast } from '../components/Toast';
 import { getErrorMessage } from '../lib/api';
+
+const HIGHLIGHTS = [
+  { icon: ClipboardList, label: 'Job orders' },
+  { icon: FileText, label: 'Invoices' },
+  { icon: Wallet, label: 'Payroll' },
+];
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -48,73 +54,107 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-full">
-      {/* Brand panel */}
-      <div className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-[var(--color-sidebar)] p-10 text-white lg:flex xl:w-[46%]">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(700px_500px_at_20%_10%,color-mix(in_srgb,var(--color-accent)_55%,transparent),transparent_60%),radial-gradient(500px_400px_at_90%_90%,rgba(255,255,255,0.06),transparent_50%)]"
-        />
-        <div className="relative">
+    <div className="login-page relative flex min-h-full flex-col lg:flex-row">
+      {/* Brand plane — full-bleed on mobile top, half-screen on desktop */}
+      <aside className="login-brand relative flex shrink-0 flex-col justify-between overflow-hidden px-5 pb-8 pt-6 text-white sm:px-8 sm:pb-10 sm:pt-8 lg:w-[46%] lg:min-h-full lg:px-10 lg:pb-10 lg:pt-10 xl:w-[48%]">
+        <div aria-hidden className="login-brand-glow pointer-events-none absolute inset-0" />
+        <div aria-hidden className="login-orb login-orb-a" />
+        <div aria-hidden className="login-orb login-orb-b" />
+        <div aria-hidden className="login-orb login-orb-c" />
+        <div aria-hidden className="login-grain pointer-events-none absolute inset-0 opacity-[0.07]" />
+
+        <div className="login-stagger relative z-[1]" style={{ '--i': 0 }}>
           <div className="flex items-center gap-3">
-            <BrandMark size="md" />
-            <div>
-              <div className="text-[15px] font-bold tracking-tight">{t('appName')}</div>
-              <div className="text-[11px] font-medium text-white/45">{t('platform')}</div>
+            <BrandMark size="md" className="login-mark-pulse ring-1 ring-white/15" />
+            <div className="min-w-0">
+              <div className="text-[13px] font-semibold tracking-wide text-white/55">{t('platform')}</div>
             </div>
           </div>
         </div>
-        <div className="relative max-w-md space-y-4 pb-6">
-          <h2 className="text-[2rem] font-extrabold leading-tight tracking-tight">
-            Jobs, invoices,<br />and payroll.
-          </h2>
-          <p className="text-[14.5px] font-medium leading-relaxed text-white/55">
+
+        <div className="relative z-[1] mt-10 max-w-lg space-y-5 lg:mt-0 lg:pb-4">
+          <h1
+            className="login-stagger text-[2.15rem] font-extrabold leading-[1.05] tracking-[-0.04em] sm:text-[2.55rem] lg:text-[2.85rem]"
+            style={{ '--i': 1 }}
+          >
+            {t('appName')}
+          </h1>
+          <p
+            className="login-stagger max-w-sm text-[14.5px] font-medium leading-relaxed text-white/60 sm:text-[15px]"
+            style={{ '--i': 2 }}
+          >
             Follow work on the press floor, keep collections current, and pay the team from attendance.
           </p>
+          <ul
+            className="login-stagger flex flex-wrap gap-2 pt-1"
+            style={{ '--i': 3 }}
+            aria-label="Workspace areas"
+          >
+            {HIGHLIGHTS.map(({ icon: Icon, label }) => (
+              <li
+                key={label}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.06] px-3 py-1.5 text-[12px] font-semibold text-white/80 backdrop-blur-sm"
+              >
+                <Icon className="h-3.5 w-3.5 text-white/55" strokeWidth={2} aria-hidden />
+                {label}
+              </li>
+            ))}
+          </ul>
         </div>
-        <div className="relative text-[12px] font-medium text-white/30">{t('domain')}</div>
-      </div>
+
+        <div
+          className="login-stagger relative z-[1] mt-8 hidden text-[12px] font-medium tracking-wide text-white/35 lg:mt-0 lg:block"
+          style={{ '--i': 4 }}
+        >
+          {t('domain')}
+        </div>
+      </aside>
 
       {/* Form column */}
-      <div className="relative flex flex-1 items-center justify-center bg-[var(--color-bg)] p-4 sm:p-8">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(700px_360px_at_80%_-10%,color-mix(in_srgb,var(--color-accent)_10%,transparent),transparent_55%)] lg:hidden"
-        />
+      <main className="login-form-pane relative flex flex-1 items-start justify-center px-4 pb-10 pt-6 sm:items-center sm:px-8 sm:py-10 lg:py-12">
+        <div aria-hidden className="login-form-wash pointer-events-none absolute inset-0 lg:opacity-100" />
+
         <div className="relative w-full max-w-[400px]">
-          <div className="mb-8 text-center lg:text-start">
-            <div className="mb-4 flex justify-center lg:hidden">
-              <BrandMark size="lg" />
-            </div>
-            <h1 className="text-[1.45rem] font-extrabold tracking-tight sm:text-[1.6rem]">
+          <div className="login-stagger mb-6 text-center sm:mb-7" style={{ '--i': 2 }}>
+            <h2 className="text-[1.5rem] font-extrabold tracking-tight text-[var(--color-text-primary)] sm:text-[1.65rem]">
               Sign in
-            </h1>
+            </h2>
             <p className="mt-1.5 text-[13px] font-medium text-[var(--color-text-muted)]">
-              {t('appName')} - {t('platform')}
+              Enter your shop credentials to continue
             </p>
           </div>
 
-          <div className="rounded-2xl border border-[var(--color-border)] bg-white/95 p-6 shadow-[0_20px_50px_-24px_rgba(16,12,8,0.28)] backdrop-blur sm:p-7">
+          <div
+            className="login-card login-stagger rounded-[1.25rem] border border-[var(--color-border)] bg-white p-5 shadow-[0_24px_60px_-28px_rgba(26,18,20,0.35)] sm:p-7"
+            style={{ '--i': 3 }}
+          >
             {errors.form ? (
-              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm font-medium text-red-700">
+              <div
+                role="alert"
+                className="mb-4 animate-[fadeUp_0.3s_ease] rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm font-medium text-red-700"
+              >
                 {errors.form}
               </div>
             ) : null}
+
             <form onSubmit={onSubmit} className="space-y-4" noValidate>
-              <Input
-                label={t('login.email')}
-                type="email"
-                icon={Mail}
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setErrors((x) => ({ ...x, email: undefined, form: undefined }));
-                }}
-                autoComplete="username"
-                error={errors.email}
-                required
-              />
-              <div className="relative">
+              <div className="login-field" style={{ '--i': 0 }}>
+                <Input
+                  label={t('login.email')}
+                  type="email"
+                  icon={Mail}
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setErrors((x) => ({ ...x, email: undefined, form: undefined }));
+                  }}
+                  autoComplete="username"
+                  error={errors.email}
+                  required
+                />
+              </div>
+
+              <div className="login-field relative" style={{ '--i': 1 }}>
                 <Input
                   label={t('login.password')}
                   type={show ? 'text' : 'password'}
@@ -131,15 +171,19 @@ export default function LoginPage() {
                 />
                 <button
                   type="button"
-                  className="absolute end-1.5 top-[34px] min-h-10 min-w-10 rounded-lg p-2 text-gray-400 hover:text-gray-600"
+                  className="absolute end-1.5 top-[34px] flex min-h-10 min-w-10 items-center justify-center rounded-lg text-gray-400 transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)] active:scale-95"
                   onClick={() => setShow((v) => !v)}
                   aria-label={show ? 'Hide password' : 'Show password'}
                 >
                   {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              <div className="flex items-center justify-between gap-3">
-                <label className="flex min-h-10 items-center gap-2.5 text-sm text-[var(--color-text-muted)]">
+
+              <div
+                className="login-field flex items-center justify-between gap-3 pt-0.5"
+                style={{ '--i': 2 }}
+              >
+                <label className="flex min-h-10 cursor-pointer items-center gap-2.5 text-sm font-medium text-[var(--color-text-muted)]">
                   <input
                     type="checkbox"
                     checked={remember}
@@ -148,15 +192,27 @@ export default function LoginPage() {
                   />
                   {t('login.remember')}
                 </label>
-                <SoftLink className="text-[13px]">{t('login.forgot')}</SoftLink>
+                <SoftLink className="text-[13px] font-semibold transition hover:opacity-80">
+                  {t('login.forgot')}
+                </SoftLink>
               </div>
-              <Button type="submit" className="w-full" loading={loading}>
-                {t('common.signIn')}
-              </Button>
+
+              <div className="login-field pt-1" style={{ '--i': 3 }}>
+                <Button type="submit" className="login-submit w-full" loading={loading}>
+                  {t('common.signIn')}
+                </Button>
+              </div>
             </form>
           </div>
+
+          <p
+            className="login-stagger mt-6 text-center text-[12px] font-medium text-[var(--color-text-muted)] lg:hidden"
+            style={{ '--i': 5 }}
+          >
+            {t('domain')}
+          </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -246,6 +246,153 @@ textarea:focus-visible {
 }
 .anim-in { animation: fadeUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
+/* —— Login page —— */
+.login-page {
+  isolation: isolate;
+}
+
+.login-brand {
+  background:
+    linear-gradient(165deg, #2a1519 0%, #1a1214 42%, #120e10 100%);
+  min-height: clamp(220px, 38svh, 320px);
+}
+
+.login-brand-glow {
+  background:
+    radial-gradient(ellipse 80% 60% at 18% 12%, color-mix(in srgb, var(--color-accent) 58%, transparent), transparent 58%),
+    radial-gradient(ellipse 55% 45% at 88% 78%, rgba(255, 255, 255, 0.07), transparent 55%),
+    radial-gradient(ellipse 40% 35% at 50% 50%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 70%);
+}
+
+.login-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+  mix-blend-mode: overlay;
+}
+
+.login-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(40px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.login-orb-a {
+  width: 220px;
+  height: 220px;
+  top: -40px;
+  inset-inline-end: -30px;
+  background: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  animation: loginOrbFloat 12s ease-in-out infinite;
+}
+
+.login-orb-b {
+  width: 160px;
+  height: 160px;
+  bottom: 12%;
+  inset-inline-start: -50px;
+  background: rgba(255, 255, 255, 0.06);
+  animation: loginOrbFloat 16s ease-in-out infinite reverse;
+  animation-delay: -3s;
+}
+
+.login-orb-c {
+  width: 100px;
+  height: 100px;
+  top: 42%;
+  inset-inline-end: 18%;
+  background: color-mix(in srgb, var(--color-accent) 28%, transparent);
+  animation: loginOrbFloat 10s ease-in-out infinite;
+  animation-delay: -6s;
+}
+
+@keyframes loginOrbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40% { transform: translate(18px, -22px) scale(1.08); }
+  70% { transform: translate(-12px, 14px) scale(0.94); }
+}
+
+.login-mark-pulse {
+  animation: loginMarkIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes loginMarkIn {
+  from { opacity: 0; transform: scale(0.82); }
+  to { opacity: 1; transform: none; }
+}
+
+.login-stagger {
+  --i: 0;
+  animation: loginRise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(0.08s + var(--i) * 0.07s);
+}
+
+@keyframes loginRise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+.login-form-pane {
+  background: var(--color-bg);
+}
+
+.login-form-wash {
+  background:
+    radial-gradient(700px 380px at 85% -5%, color-mix(in srgb, var(--color-accent) 11%, transparent), transparent 55%),
+    radial-gradient(500px 300px at 10% 100%, rgba(26, 18, 20, 0.04), transparent 50%);
+}
+
+.login-card {
+  transition: box-shadow 0.35s ease, transform 0.35s ease;
+}
+
+.login-card:focus-within {
+  box-shadow:
+    0 28px 64px -28px rgba(26, 18, 20, 0.4),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
+
+.login-field {
+  --i: 0;
+  animation: loginRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(0.32s + var(--i) * 0.06s);
+}
+
+.login-submit {
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  box-shadow: 0 8px 24px -10px color-mix(in srgb, var(--color-accent) 70%, transparent);
+}
+
+.login-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px -10px color-mix(in srgb, var(--color-accent) 80%, transparent);
+}
+
+.login-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+@media (min-width: 1024px) {
+  .login-brand {
+    min-height: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-orb,
+  .login-mark-pulse,
+  .login-stagger,
+  .login-field {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .login-submit:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
 @keyframes shimmer {
   0% { background-position: 100% 0; }
   100% { background-position: -100% 0; }
